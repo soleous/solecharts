@@ -1,0 +1,796 @@
+groups:
+  - name: "Add Pod Resource"
+    description: "Configure a workload resource, such as a Pod, Deployment, StatefulSet"
+  - name: "Add Deployment Resource"
+    description: "Configure a workload resource, such as a Pod, Deployment, StatefulSet"
+  - name: "Add Service Resource"
+    description: "Configure a workload resource, such as a Pod, Deployment, StatefulSet"
+
+questions:
+  ##########################################################
+  ################ POD Resource Definitions ################
+  ##########################################################
+  - variable: podList
+    group: "Add Pod Resource"
+    label: "One or More Pod Resources"
+    description: "Add Pod Resource"
+    schema:
+      type: list
+      hidden: true
+      items:
+        - variable: values
+          label: ""
+          schema:
+            type: dict
+            attrs:
+              ### Pod Metadata
+              - variable: metadata
+                label: "Metadata Configuration"
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: customNameEnable
+                      label: "Customize Pod Name (default is Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: name
+                            label: "Pod Name"
+                            schema:
+                              type: string
+                              required: true
+                    - variable: customLabelsEnable
+                      label: "Customize Pod Labels (defaults \"Key\" is 'app' and \"Value\" Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: customLabelsList
+                            label: "Pod Labels"
+                            schema:
+                              type: list
+                              items:
+                                - variable: labelValues
+                                  label: "Key/Vaue Pair"
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: key
+                                        label: "Key"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: value
+                                        label: "Value"
+                                        schema:
+                                          type: string
+                                          required: true
+              ### Pod Configurtion - Container
+              - variable: container
+                label: "Container Configuration"
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: customNameEnable
+                      label: "Customize Container Name (default is Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: name
+                            label: "Container Name"
+                            schema:
+                              type: string
+                    ### Container Image Configuration
+                    #### REPLICATE QUESTIONS TO ADDITIONAL CONTAINER LIST - START
+                    - variable: repository
+                      description: "Docker image repository"
+                      label: "Container Image repository"
+                      schema:
+                        type: string
+                        required: true
+                    - variable: tag
+                      description: "Tag to use for specified image"
+                      label: "Container Image Tag"
+                      schema:
+                        type: string
+                        default: "latest"
+                    - variable: pullPolicy
+                      description: "Docker Image Pull Policy"
+                      label: "Container Image Pull Policy"
+                      schema:
+                        type: string
+                        default: "Always"
+                        enum:
+                          - value: "IfNotPresent"
+                            description: "Only pull image if not present on host"
+                          - value: "Always"
+                            description: "Always pull image even if present on host"
+                          - value: "Never"
+                            description: "Never pull image even if it's not present on host"
+                    ### Container Port Configuration
+                    - variable: portsList
+                      label: "Container Ports"
+                      description: "Specify ports for the container"
+                      schema:
+                        type: list
+                        items:
+                          - variable: portValues
+                            label: "Container Port Configuration"
+                            description: "Configure all ports the container requires to function"
+                            schema:
+                              type: dict
+                              attrs:
+                                - variable: name
+                                  label: "Port Name"
+                                  schema:
+                                    type: string
+                                    required: true
+                                - variable: port
+                                  label: "Container Port"
+                                  schema:
+                                    type: int
+                                    required: true
+                                - variable: protocol
+                                  label: "Protocol"
+                                  schema:
+                                    type: string
+                                    default: "TCP"
+                                    enum:
+                                      - value: "TCP"
+                                        description: "TCP Protocol"
+                                      - value: "UDP"
+                                        description: "UDP Protocol"
+                                - variable: hostIPEnable
+                                  label: "Add hostIP"
+                                  schema:
+                                    type: boolean
+                                    default: false
+                                    show_subquestions_if: true
+                                    subquestions:
+                                      - variable: hostIP
+                                        label: "hostIP"
+                                        schema:
+                                          type: string
+                                - variable: hostPortEnable
+                                  label: "Add hostPort"
+                                  schema:
+                                    type: boolean
+                                    default: false
+                                    show_subquestions_if: true
+                                    subquestions:
+                                      - variable: hostPort
+                                        label: "hostPort"
+                                        schema:
+                                          type: string
+                    #### REPLICATE QUESTIONS TO ADDITIONAL CONTAINER LIST - END
+                    ### Pod Configuration - ADDITIONAL CONTAINERS
+                    - variable: additionalContainer
+                      label: ""
+                      description: "Add Additional Containers"
+                      schema:
+                        type: dict
+                        attrs:
+                          - variable: list
+                            label: "Additional Containers"
+                            description: "Add Additional Container"
+                            schema:
+                              type: list
+                              items:
+                                - variable: listValues
+                                  label: ""
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: name
+                                        label: "Container Name"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      ### Changes can be copyed following "Container Image Configuration"
+                                      - variable: repository
+                                        description: "Docker image repository"
+                                        label: "Container Image repository"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: tag
+                                        description: "Tag to use for specified image"
+                                        label: "Container Image Tag"
+                                        schema:
+                                          type: string
+                                          default: "latest"
+                                      - variable: pullPolicy
+                                        description: "Docker Image Pull Policy"
+                                        label: "Container Image Pull Policy"
+                                        schema:
+                                          type: string
+                                          default: "IfNotPresent"
+                                          enum:
+                                            - value: "IfNotPresent"
+                                              description: "Only pull image if not present on host"
+                                            - value: "Always"
+                                              description: "Always pull image even if present on host"
+                                            - value: "Never"
+                                              description: "Never pull image even if it's not present on host"
+                                      ### Container Port Configuration
+                                      - variable: portsList
+                                        label: "Container Ports"
+                                        description: "Specify ports for the container"
+                                        schema:
+                                          type: list
+                                          items:
+                                            - variable: portValues
+                                              label: "Container Port Configuration"
+                                              description: "Configure all ports the container requires to function"
+                                              schema:
+                                                type: dict
+                                                attrs:
+                                                  - variable: name
+                                                    label: "Port Name"
+                                                    schema:
+                                                      type: string
+                                                      required: true
+                                                  - variable: port
+                                                    label: "Container Port"
+                                                    schema:
+                                                      type: int
+                                                      required: true
+                                                  - variable: protocol
+                                                    label: "Protocol"
+                                                    schema:
+                                                      type: string
+                                                      default: "TCP"
+                                                      enum:
+                                                        - value: "TCP"
+                                                          description: "TCP Protocol"
+                                                        - value: "UDP"
+                                                          description: "UDP Protocol"
+                                                  - variable: hostIPEnable
+                                                    label: "Add hostIP"
+                                                    schema:
+                                                      type: boolean
+                                                      default: false
+                                                      show_subquestions_if: true
+                                                      subquestions:
+                                                        - variable: hostIP
+                                                          label: "hostIP"
+                                                          schema:
+                                                            type: string
+                                                  - variable: hostPortEnable
+                                                    label: "Add hostPort"
+                                                    schema:
+                                                      type: boolean
+                                                      default: false
+                                                      show_subquestions_if: true
+                                                      subquestions:
+                                                        - variable: hostPort
+                                                          label: "hostPort"
+                                                          schema:
+                                                            type: string
+
+
+
+
+
+  #################################################################
+  ################ Deployment Resource Definitions ################
+  #################################################################
+  - variable: deploymentList
+    group: "Add Deployment Resource"
+    label: "One or More Deployment Resources"
+    description: "Add Deployment Resource"
+    schema:
+      type: list
+      items:
+        - variable: values
+          label: ""
+          schema:
+            type: dict
+            attrs:
+              ### Deployment Metadata
+              - variable: metadata
+                label: "Deployment Metadata Configuration"
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: customNameEnable
+                      label: "Customize Deployment Name (default is Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: name
+                            label: "Deployment Name"
+                            schema:
+                              type: string
+                              required: true
+                    - variable: customLabelsEnable
+                      label: "Customize Deployment Labels (defaults \"Key\" is 'app' and \"Value\" Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: customLabelsList
+                            label: "Deployment Labels"
+                            schema:
+                              type: list
+                              items:
+                                - variable: labelValues
+                                  label: "Key/Vaue Pair"
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: key
+                                        label: "Key"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: value
+                                        label: "Value"
+                                        schema:
+                                          type: string
+                                          required: true
+              ### Pod Template Configuration
+              - variable: podTemplate
+                label: ""
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: metadata
+                      label: "Pod Template Metadata Configuration"
+                      schema:
+                        type: dict
+                        attrs:
+                        - variable: customLabelsEnable
+                          label: "Customize Pod Template Labels (defaults \"Key\" is 'app' and \"Value\" Application Name)"
+                          schema:
+                            type: boolean
+                            default: false
+                            show_subquestions_if: true
+                            subquestions:
+                              - variable: customLabelsList
+                                label: "Pod Labels"
+                                schema:
+                                  type: list
+                                  items:
+                                    - variable: labelValues
+                                      label: "Key/Vaue Pair"
+                                      schema:
+                                        type: dict
+                                        attrs:
+                                          - variable: key
+                                            label: "Key"
+                                            schema:
+                                              type: string
+                                              required: true
+                                          - variable: value
+                                            label: "Value"
+                                            schema:
+                                              type: string
+                                              required: true
+                    ### Pod Configurtion - Container
+                    - variable: container
+                      label: "Container Configuration"
+                      schema:
+                        type: dict
+                        attrs:
+                          - variable: customNameEnable
+                            label: "Customize Container Name (default is Application Name)"
+                            schema:
+                              type: boolean
+                              default: false
+                              show_subquestions_if: true
+                              subquestions:
+                                - variable: name
+                                  label: "Container Name"
+                                  schema:
+                                    type: string
+                          ### Container Image Configuration
+                          #### REPLICATE QUESTIONS TO ADDITIONAL CONTAINER LIST - START
+                          - variable: repository
+                            description: "Docker image repository"
+                            label: "Container Image repository"
+                            schema:
+                              type: string
+                              required: true
+                          - variable: tag
+                            description: "Tag to use for specified image"
+                            label: "Container Image Tag"
+                            schema:
+                              type: string
+                              default: "latest"
+                          - variable: pullPolicy
+                            description: "Docker Image Pull Policy"
+                            label: "Container Image Pull Policy"
+                            schema:
+                              type: string
+                              default: "IfNotPresent"
+                              enum:
+                                - value: "IfNotPresent"
+                                  description: "Only pull image if not present on host"
+                                - value: "Always"
+                                  description: "Always pull image even if present on host"
+                                - value: "Never"
+                                  description: "Never pull image even if it's not present on host"
+                          ### Container Port Configuration
+                          - variable: portsList
+                            label: "Container Ports"
+                            description: "Specify ports for the container"
+                            schema:
+                              type: list
+                              items:
+                                - variable: portValues
+                                  label: "Container Port Configuration"
+                                  description: "Configure all ports the container requires to function"
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: name
+                                        label: "Port Name"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: port
+                                        label: "Container Port"
+                                        schema:
+                                          type: int
+                                          required: true
+                                      - variable: protocol
+                                        label: "Protocol"
+                                        schema:
+                                          type: string
+                                          default: "TCP"
+                                          enum:
+                                            - value: "TCP"
+                                              description: "TCP Protocol"
+                                            - value: "UDP"
+                                              description: "UDP Protocol"
+                                      - variable: hostIPEnable
+                                        label: "Add hostIP"
+                                        schema:
+                                          type: boolean
+                                          default: false
+                                          show_subquestions_if: true
+                                          subquestions:
+                                            - variable: hostIP
+                                              label: "hostIP"
+                                              schema:
+                                                type: string
+                                      - variable: hostPortEnable
+                                        label: "Add hostPort"
+                                        schema:
+                                          type: boolean
+                                          default: false
+                                          show_subquestions_if: true
+                                          subquestions:
+                                            - variable: hostPort
+                                              label: "hostPort"
+                                              schema:
+                                                type: string
+                          #### REPLICATE QUESTIONS TO ADDITIONAL CONTAINER LIST - END
+                          ### Pod Configuration - ADDITIONAL CONTAINERS
+                          - variable: additionalContainer
+                            label: ""
+                            description: "Add Additional Containers"
+                            schema:
+                              type: dict
+                              attrs:
+                                - variable: list
+                                  label: "Additional Containers"
+                                  description: "Add Additional Container"
+                                  schema:
+                                    type: list
+                                    items:
+                                      - variable: listValues
+                                        label: ""
+                                        schema:
+                                          type: dict
+                                          attrs:
+                                            - variable: name
+                                              label: "Container Name"
+                                              schema:
+                                                type: string
+                                                required: true
+                                            ### Changes can be copyed following "Container Image Configuration"
+                                            - variable: repository
+                                              description: "Docker image repository"
+                                              label: "Container Image repository"
+                                              schema:
+                                                type: string
+                                                required: true
+                                            - variable: tag
+                                              description: "Tag to use for specified image"
+                                              label: "Container Image Tag"
+                                              schema:
+                                                type: string
+                                                default: "latest"
+                                            - variable: pullPolicy
+                                              description: "Docker Image Pull Policy"
+                                              label: "Container Image Pull Policy"
+                                              schema:
+                                                type: string
+                                                default: "IfNotPresent"
+                                                enum:
+                                                  - value: "IfNotPresent"
+                                                    description: "Only pull image if not present on host"
+                                                  - value: "Always"
+                                                    description: "Always pull image even if present on host"
+                                                  - value: "Never"
+                                                    description: "Never pull image even if it's not present on host"
+                                            ### Container Port Configuration
+                                            - variable: portsList
+                                              label: "Container Ports"
+                                              description: "Specify ports for the container"
+                                              schema:
+                                                type: list
+                                                items:
+                                                  - variable: portValues
+                                                    label: "Container Port Configuration"
+                                                    description: "Configure all ports the container requires to function"
+                                                    schema:
+                                                      type: dict
+                                                      attrs:
+                                                        - variable: name
+                                                          label: "Port Name"
+                                                          schema:
+                                                            type: string
+                                                            required: true
+                                                        - variable: port
+                                                          label: "Container Port"
+                                                          schema:
+                                                            type: int
+                                                            required: true
+                                                        - variable: protocol
+                                                          label: "Protocol"
+                                                          schema:
+                                                            type: string
+                                                            default: "TCP"
+                                                            enum:
+                                                              - value: "TCP"
+                                                                description: "TCP Protocol"
+                                                              - value: "UDP"
+                                                                description: "UDP Protocol"
+                                                        - variable: hostIPEnable
+                                                          label: "Add hostIP"
+                                                          schema:
+                                                            type: boolean
+                                                            default: false
+                                                            show_subquestions_if: true
+                                                            subquestions:
+                                                              - variable: hostIP
+                                                                label: "hostIP"
+                                                                schema:
+                                                                  type: string
+                                                        - variable: hostPortEnable
+                                                          label: "Add hostPort"
+                                                          schema:
+                                                            type: boolean
+                                                            default: false
+                                                            show_subquestions_if: true
+                                                            subquestions:
+                                                              - variable: hostPort
+                                                                label: "hostPort"
+                                                                schema:
+                                                                  type: string
+
+
+
+
+
+  ##############################################################
+  ################ Service Resource Definitions ################
+  ##############################################################
+  - variable: serviceList
+    group: "Add Service Resource"
+    label: "One or More Service Resources"
+    description: "Add Service Resource"
+    schema:
+      type: list
+      items:
+        ### Service Configuration
+        - variable: values
+          label: ""
+          schema:
+            type: dict
+            attrs:
+              ### Pod Metadata
+              - variable: metadata
+                label: "Metadata"
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: customNameEnable
+                      label: "Customize Service Name (default is Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: name
+                            label: "Service Name"
+                            schema:
+                              type: string
+                              required: true
+                  ### Custom Lables
+                    - variable: customLabelsEnable
+                      label: "Customize Service Labels (defaults \"Key\" is 'app' and \"Value\" Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: customLabelsList
+                            label: "Service Labels"
+                            schema:
+                              type: list
+                              items:
+                                - variable: labelValues
+                                  label: "Key/Vaue Pair"
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: key
+                                        label: "Key"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: value
+                                        label: "Value"
+                                        schema:
+                                          type: string
+                                          required: true
+              ### Specification
+              - variable: selector
+                label: "Service Selector"
+                schema:
+                  type: dict
+                  attrs:
+                    ### Custom Selector
+                    - variable: customSelectorEnable
+                      label: "Customize Service Selector (defaults \"Key\" is 'app' and \"Value\" Application Name)"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: customSelectorList
+                            label: "Service Selectors"
+                            schema:
+                              type: list
+                              items:
+                                - variable: labelValues
+                                  label: "Key/Vaue Pair"
+                                  schema:
+                                    type: dict
+                                    attrs:
+                                      - variable: key
+                                        label: "Key"
+                                        schema:
+                                          type: string
+                                          required: true
+                                      - variable: value
+                                        label: "Value"
+                                        schema:
+                                          type: string
+                                          required: true
+                    #- variable: type
+                    #  label: "Configuration \"Type\" (for internal and external access)"
+                    #  schema:
+                    #    type: string
+                    #    default: "ClusterIP"
+                    #    enum:
+                    #      - value: "ClusterIP"
+                    #        description: "ClusterIP - Exposes the Service on a cluster-internal IP. Unless a static ExternalIP is set."
+                    #      - value: "NodePort"
+                    #        description: "NodePort - Exposes the ClusterIP Service on each Node's IP at a static port."
+                    #      - value: "LoadBalancer"
+                    #        description: "LoadBlancer - Expose via NodePort and ExternalIP, typically for external Load Balancer."
+              - variable: ports
+                label: "Service Port Configuration"
+                description: "Configure all ports the container requires to function"
+                schema:
+                  type: dict
+                  attrs:
+                    - variable: name
+                      label: "Port Name"
+                      schema:
+                        type: string
+                        required: true
+                    - variable: protocol
+                      label: "Protocol"
+                      schema:
+                        type: string
+                        default: "TCP"
+                        enum:
+                          - value: "TCP"
+                            description: "TCP Protocol"
+                          - value: "UDP"
+                            description: "UDP Protocol"
+                    - variable: port
+                      label: "Port (Service)"
+                      schema:
+                        type: int
+                        required: true
+                    - variable: targetPort
+                      label: "Target Port (Pod/Container)"
+                      schema:
+                        type: int
+                        required: true
+                    - variable: nodePortEnable
+                      label: "Configure NodePort"
+                      schema:
+                        type: boolean
+                        default: false
+                        show_subquestions_if: true
+                        subquestions:
+                          - variable: nodePort
+                            label: "NodePort"
+                            schema:
+                              type: int
+                    ### Port Configuration
+                    - variable: portList
+                      label: "Additional Service Ports"
+                      description: "Specify ports for the service"
+                      schema:
+                        type: list
+                        items:
+                          - variable: portValues
+                            label: "Service Port Configuration"
+                            description: "Configure all ports the container requires to function"
+                            schema:
+                              type: dict
+                              attrs:
+                                - variable: name
+                                  label: "Port Name"
+                                  schema:
+                                    type: string
+                                    required: true
+                                - variable: protocol
+                                  label: "Protocol"
+                                  schema:
+                                    type: string
+                                    default: "TCP"
+                                    enum:
+                                      - value: "TCP"
+                                        description: "TCP Protocol"
+                                      - value: "UDP"
+                                        description: "UDP Protocol"
+                                - variable: port
+                                  label: "Port (Service)"
+                                  schema:
+                                    type: int
+                                    required: true
+                                - variable: targetPort
+                                  label: "Target Port (Pod/Container)"
+                                  schema:
+                                    type: int
+                                    required: true
+                                - variable: nodePortEnable
+                                  label: "Configure NodePort"
+                                  schema:
+                                    type: boolean
+                                    default: false
+                                    show_subquestions_if: true
+                                    subquestions:
+                                      - variable: nodePort
+                                        label: "NodePort"
+                                        schema:
+                                          type: int
+              ### External IP
+              - variable: externalIPList
+                label: "Configure ExternalIPs"
+                description: "Specify ports for the service"
+                schema:
+                  type: list
+                  items:
+                    - variable: externalIP
+                      label: "ExternalIP"
+                      schema:
+                        type: string
