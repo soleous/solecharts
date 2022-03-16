@@ -1,0 +1,23 @@
+groups:
+  - name: "Add Manifest File"
+    description: "Configure a workload resource, such as a Pod, Deployment, StatefulSet"
+
+  ###########################################################
+  ################ Manifest File Definitions ################
+  ###########################################################
+  - variable: manifestList
+    group: "Add Manifest File"
+    label: "Add Manifest File"
+    description: "Add Manifest File"
+    schema:
+      type: list
+      items:
+        - variable: values
+          label: ""
+          schema:
+            type: dict
+            attrs:
+            - variable: name
+              label: "Name"
+              schema:
+                type: string
