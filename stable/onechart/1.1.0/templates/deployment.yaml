@@ -22,8 +22,15 @@ spec:
       - name: {{ .podTemplate.container.name | default $.Chart.Name }}
         image: {{ .podTemplate.container.repository }}:{{ .podTemplate.container.tag }}
         imagePullPolicy: {{ .podTemplate.container.pullPolicy }}
-        ports:
+        {{- if .podTemplate.container.envList }}
+        env:
+        {{- range .podTemplate.container.envList }}
+        - name: {{ .key }}
+          value: {{ .value }}
+        {{- end }}
+        {{- end }}
         {{- if .podTemplate.container.portsList }}
+        ports:
         {{- range .podTemplate.container.portsList }}
         - name: {{ .name }}
           containerPort: {{ .port }}

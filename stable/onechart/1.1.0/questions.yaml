@@ -411,7 +411,7 @@ questions:
                             label: "Container Image Pull Policy"
                             schema:
                               type: string
-                              default: "IfNotPresent"
+                              default: "Always"
                               enum:
                                 - value: "IfNotPresent"
                                   description: "Only pull image if not present on host"
@@ -420,12 +420,12 @@ questions:
                                 - value: "Never"
                                   description: "Never pull image even if it's not present on host"
                           ### Container Enviromental Variables Configuration
-                          - variable: containerEnvironmentVariables
+                          - variable: envList
                             label: "Container Environment Variables"
                             schema:
                               type: list
                               items:
-                                - variable: envList
+                                - variable: envValues
                                   label: "Container Environment Variable Configuration"
                                   schema:
                                     type: dict
@@ -546,12 +546,12 @@ questions:
                                                   - value: "Never"
                                                     description: "Never pull image even if it's not present on host"
                                             ### Container Enviromental Variables Configuration
-                                            - variable: containerEnvironmentVariables
+                                            - variable: envList
                                               label: "Container Environment Variables"
                                               schema:
                                                 type: list
                                                 items:
-                                                  - variable: envList
+                                                  - variable: envValues
                                                     label: "Container Environment Variable Configuration"
                                                     schema:
                                                       type: dict
