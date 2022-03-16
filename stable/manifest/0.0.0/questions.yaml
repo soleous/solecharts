@@ -5,6 +5,7 @@ groups:
   ###########################################################
   ################ Manifest File Definitions ################
   ###########################################################
+questions:
   - variable: manifestList
     group: "Add Manifest File"
     label: "Add Manifest File"
