@@ -537,7 +537,7 @@ questions:
                                               label: "Container Image Pull Policy"
                                               schema:
                                                 type: string
-                                                default: "IfNotPresent"
+                                                default: "Always"
                                                 enum:
                                                   - value: "IfNotPresent"
                                                     description: "Only pull image if not present on host"
