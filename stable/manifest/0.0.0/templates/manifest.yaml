@@ -1,4 +1,1 @@
-{{- range $index, $manifest := .Values.manifestList }}
----
-{{ .files.get "../manifest/example.yaml" }}
-{{- end }}
+{{ .Files.Get "manifest/example.yaml" }}
