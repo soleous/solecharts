@@ -1,0 +1,35 @@
+{{- range $index, $service := .Values.serviceList }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .metadata.name | default $.Chart.Name }}
+  labels:
+    {{- $labelDefault := list (dict "key" "app" "value" $.Chart.Name) }}
+    {{- include "labels" (list .metadata.customLabelsList $labelDefault) | indent 4 }}
+spec:
+  selector:
+    {{- $selectorDefault := list (dict "key" "app" "value" $.Chart.Name) }}
+    {{- include "labels" (list .selector.customSelectorList $selectorDefault) | indent 4 }}
+  ports:
+  - name: {{ .ports.name }}
+    port: {{ .ports.port }}
+    protocol: {{ .ports.protocol }}
+    targetPort: {{ .ports.targetPort }}
+    nodePort: {{ .ports.nodePort }}
+  {{- if .ports.portList }}
+  {{- range .ports.portList }}
+  - name: {{ .name }}
+    port: {{ .port }}
+    protocol: {{ .protocol }}
+    targetPort: {{ .targetPort }}
+    nodePort: {{ .nodePort }}
+  {{- end }}
+  {{- end }}
+  {{- if .externalIPList }}
+  externalIPs:
+  {{- range .externalIPList }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+{{- end }}

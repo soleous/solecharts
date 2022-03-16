@@ -1,0 +1,42 @@
+{{- range $index, $pod := .Values.podList }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .metadata.name | default $.Chart.Name }}
+  labels:
+    {{- $labelDefault := list (dict "key" "app" "value" $.Chart.Name) }}
+    {{- include "labels" (list .metadata.customLabelsList $labelDefault) | indent 4 }}
+spec:
+  containers:
+  - name: {{ .container.name | default $.Chart.Name }}
+    image: {{ .container.repository }}:{{ .container.tag }}
+    imagePullPolicy: {{ .container.pullPolicy }}
+    ports:
+    {{- if .container.portsList }}
+    {{- range .container.portsList }}
+    - name: {{ .name }}
+      containerPort: {{ .port }}
+      protocol: {{ .protocol }}
+      hostIP: {{ .hostIP }}
+      hostPort: {{ .hostPort }}
+    {{- end }}
+    {{- end }}
+  {{- if .container.additionalContainer.list }}
+  {{- range .container.additionalContainer.list }}
+  - name: {{ .name | default $.Chart.Name }}
+    image: {{ .repository }}:{{ .tag }}
+    imagePullPolicy: {{ .pullPolicy }}
+    ports:
+    {{- if .portsList }}
+    {{- range .portsList }}
+    - name: {{ .name }}
+      containerPort: {{ .port }}
+      protocol: {{ .protocol }}
+      hostIP: {{ .hostIP }}
+      hostPort: {{ .hostPort }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
