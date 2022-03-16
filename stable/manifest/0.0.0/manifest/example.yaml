@@ -17,7 +17,7 @@ spec:
       - name: nginx
         image: nginx
         ports:
-        - containerPort: 8080
+        - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -30,7 +30,7 @@ spec:
   - name: http
     port: 8080
     protocol: TCP
-    targetPort: 8080
+    targetPort: 80
   externalIPs:
   - 10.232.3.32
   selector:
