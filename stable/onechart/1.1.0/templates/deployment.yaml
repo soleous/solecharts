@@ -25,8 +25,8 @@ spec:
         {{- if .podTemplate.container.envList }}
         env:
         {{- range .podTemplate.container.envList }}
-        - name: {{ .key }}
-          value: {{ .value }}
+        - name: {{ .key | quote }}
+          value: {{ .value | quote }}
         {{- end }}
         {{- end }}
         {{- if .podTemplate.container.portsList }}
